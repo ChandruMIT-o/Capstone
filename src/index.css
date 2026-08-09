@@ -19,7 +19,10 @@
   
   body {
     font-family: "Outfit", sans-serif;
-    @apply transition-colors duration-300 antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    @apply transition-colors duration-300;
   }
 }
 
@@ -110,4 +113,20 @@
 /* Smooth custom background transitions */
 .bg-transition {
   @apply transition-all duration-300;
+}
+
+/* macOS/Safari Native Input and Date alignment resets */
+input[type="date"],
+textarea,
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
 }
