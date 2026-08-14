@@ -1,0 +1,82 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+    darkMode: 'class',
+    content: [
+        './index.html',
+        './src/**/*.{js,ts,jsx,tsx}',
+    ],
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: ['"Outfit"', 'sans-serif'],
+                display: ['"Outfit"', 'sans-serif'],
+            },
+            colors: {
+                brand: {
+                    50: '#F0F4FF',
+                    100: '#E0EAFF',
+                    200: '#C7D7FE',
+                    300: '#A4BCFD',
+                    400: '#6172F3',
+                    500: '#444CE7',
+                    600: '#3538CD',
+                    700: '#2D31A6',
+                    800: '#1F235B',
+                    900: '#101323',
+                },
+                surface: {
+                    50: '#F8FAFC',
+                    100: '#F1F5F9',
+                    200: '#E2E8F0',
+                    300: '#CBD5E1',
+                    700: '#334155',
+                    800: '#1E293B',
+                    900: '#0F172A',
+                },
+                // Semantic functional colors
+                'status-danger': '#DC2626',
+                'status-danger-bg': '#FEE2E2',
+                'status-warning': '#D97706',
+                'status-warning-bg': '#FEF3C7',
+                'status-success': '#16A34A',
+                'status-success-bg': '#DCFCE7',
+                'status-info': '#2563EB',
+                'status-info-bg': '#DBEAFE',
+                // Optum Blue brand palette preserved
+                'optum-blue': '#3B5998',
+                'optum-blue-dark': '#2A3F6D',
+                'optum-blue-light': '#4A69BD',
+                'optum-blue-pale': '#EEF2FF',
+                'optum-navy': '#1E1E24',
+                'optum-white': '#FFFFFF',
+                'optum-gray-50': '#F4F6FA',
+                'optum-gray-100': '#EBEFF5',
+                'optum-gray-200': '#D8DDE8',
+                'optum-gray-500': '#64748B',
+                'optum-gray-700': '#334155',
+                'optum-gray-900': '#0F172A',
+                'optum-orange': '#4F46E5',
+                'optum-dark-orange': '#4338CA',
+                'optum-warm-white': '#F4F6FA',
+                'optum-warm-gray': '#1E293B',
+                'optum-horizon': '#F1F5F9',
+                'optum-dawn': '#E0E7FF',
+                'optum-sunset': '#C7D2FE',
+            },
+            spacing: {
+                '4.5': '1.125rem',
+                '5.5': '1.375rem',
+                '6.5': '1.625rem',
+                '7.5': '1.875rem',
+                '8.5': '2.125rem',
+                '9.5': '2.375rem',
+                '0.2': '0.05rem',
+            },
+            borderRadius: {
+                '4xl': '2rem',
+                '5xl': '2.5rem',
+            }
+        },
+    },
+    plugins: [],
+}

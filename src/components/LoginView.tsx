@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Shield, Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 interface LoginViewProps {
-  onLogin: (email: string, role: 'ADMIN' | 'READ_WRITE' | 'READ_ONLY', name: string) => void;
+  onLogin: (email: string, role: 'ADMINISTRATOR' | 'COORDINATOR' | 'AUDITOR', name: string) => void;
   onRegister: (email: string, name: string) => void;
 }
 
@@ -20,29 +20,27 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegister }) => 
     e.preventDefault();
     setError('');
 
-    // Verification for demo accounts
     if (email === 'admin@optum.com') {
       if (password === 'admin123') {
-        onLogin(email, 'ADMIN', 'System Administrator');
+        onLogin(email, 'ADMINISTRATOR', 'System Administrator');
       } else {
         setError('Incorrect administrator password');
       }
     } else if (email === 'coordinator@optum.com') {
       if (password === 'coordinator123') {
-        onLogin(email, 'READ_WRITE', 'Jordan Lee');
+        onLogin(email, 'COORDINATOR', 'Jordan Lee');
       } else {
         setError('Incorrect coordinator password');
       }
     } else if (email === 'visitor@optum.com') {
       if (password === 'visitor123') {
-        onLogin(email, 'READ_ONLY', 'Visitor User');
+        onLogin(email, 'AUDITOR', 'Visitor User');
       } else {
         setError('Incorrect visitor password');
       }
     } else {
-      // Simulate login for any custom registered user
       if (password.length >= 6) {
-        onLogin(email, 'READ_WRITE', email.split('@')[0]);
+        onLogin(email, 'COORDINATOR', email.split('@')[0]);
       } else {
         setError('Password must be at least 6 characters long');
       }
@@ -84,111 +82,106 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegister }) => 
     setPassword(passVal);
     setError('');
 
-    // Trigger immediate login
     if (emailVal === 'admin@optum.com') {
-      onLogin(emailVal, 'ADMIN', 'System Administrator');
+      onLogin(emailVal, 'ADMINISTRATOR', 'System Administrator');
     } else if (emailVal === 'coordinator@optum.com') {
-      onLogin(emailVal, 'READ_WRITE', 'Jordan Lee');
+      onLogin(emailVal, 'COORDINATOR', 'Jordan Lee');
     } else if (emailVal === 'visitor@optum.com') {
-      onLogin(emailVal, 'READ_ONLY', 'Visitor User');
+      onLogin(emailVal, 'AUDITOR', 'Visitor User');
     }
   };
 
   return (
-    <div className="min-h-screen w-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      {/* Background glowing decorations */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen w-screen bg-[#F4F6FA] dark:bg-[#0B0F19] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      {/* Background Soft Glow Accents */}
+      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-5%] w-[45%] h-[45%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Main card */}
-      <div className="w-full max-w-md bg-slate-950/65 backdrop-blur-md rounded-3xl border border-slate-800/80 shadow-2xl p-8 relative z-10 animate-fade-in">
+      {/* Main Login Card */}
+      <div className="w-full max-w-md bg-white dark:bg-[#131B2E] rounded-2xl border border-[#EEF2F6] dark:border-slate-800 shadow-xl p-6 sm:p-8 relative z-10 animate-pop-in">
         {/* Header Branding */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-12 h-12 bg-white text-slate-950 rounded-2xl flex items-center justify-center shadow-lg mb-3">
-            <Shield className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
+        <div className="flex flex-col items-center mb-6 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 mb-3">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
           </div>
-          <h2 className="text-xl font-extrabold text-white tracking-tight">Optum CarePortal</h2>
-          <p className="text-xs text-slate-400 mt-1 text-center">
-            Secured caseload management & care coordination tracking
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Optum<span className="text-indigo-600 dark:text-indigo-400">Care</span> Portal
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            Care Coordination &amp; Referral SLA Management
           </p>
         </div>
 
-        {/* Tab selection */}
-        <div className="flex bg-slate-900/80 p-1.5 rounded-2xl mb-6 border border-slate-800/40">
+        {/* Tab Selection */}
+        <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-full mb-6 border border-slate-200/60 dark:border-slate-700 shadow-inner">
           <button
             onClick={() => { setActiveTab('login'); setError(''); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'login'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`flex-1 py-2.5 text-xs sm:text-[13px] font-extrabold rounded-full transition-all cursor-pointer ${activeTab === 'login'
+                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
           >
             Sign In
           </button>
           <button
             onClick={() => { setActiveTab('register'); setError(''); }}
-            className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'register'
-                ? 'bg-slate-800 text-white shadow-sm border border-slate-700/50'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`flex-1 py-2.5 text-xs sm:text-[13px] font-extrabold rounded-full transition-all cursor-pointer ${activeTab === 'register'
+                ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+              }`}
           >
             Register
           </button>
         </div>
 
-        {/* Form error/success messages */}
         {error && (
-          <div className="p-3 mb-4 bg-rose-950/30 text-rose-400 text-xs font-semibold rounded-xl border border-rose-900/30 flex items-center gap-2">
-            <Shield className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-        {success && (
-          <div className="p-3 mb-4 bg-emerald-950/30 text-emerald-400 text-xs font-semibold rounded-xl border border-emerald-900/30 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 shrink-0" />
-            <span>{success}</span>
+          <div className="p-3.5 mb-4 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300 text-xs font-bold rounded-2xl border border-rose-200 dark:border-rose-800 animate-pop-in">
+            {error}
           </div>
         )}
 
-        {/* Sign In Form */}
+        {success && (
+          <div className="p-3.5 mb-4 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-300 text-xs font-bold rounded-2xl border border-emerald-200 dark:border-emerald-800 animate-pop-in">
+            {success}
+          </div>
+        )}
+
+        {/* Forms */}
         {activeTab === 'login' ? (
-          <form onSubmit={handleLoginSubmit} className="space-y-4.5">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Workplace Email
-              </label>
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Email Address</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
-                  required
-                  placeholder="name@optum.com"
                   value={email}
+                  placeholder="name@optum.com"
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full pl-11 pr-4 py-3 bg-slate-50/90 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                  required
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Password
-              </label>
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Password</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••"
                   value={password}
+                  placeholder="••••••••"
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full pl-11 pr-11 py-3 bg-slate-50/90 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -197,138 +190,97 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegister }) => 
 
             <button
               type="submit"
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-1.5 mt-6 cursor-pointer active:scale-98"
+              className="w-full py-3.5 bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs sm:text-[13px] font-bold rounded-full transition-all shadow-md active:scale-95 cursor-pointer mt-2"
             >
-              Access System <ArrowRight className="w-4 h-4" />
+              Sign In to Portal
             </button>
           </form>
         ) : (
-          /* Register Form */
-          <form onSubmit={handleRegisterSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
-                />
-              </div>
+          <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Full Name</label>
+              <input
+                type="text"
+                value={name}
+                placeholder="Dr. Alex Vance"
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4.5 py-3 bg-slate-50/90 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                required
+              />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                Workplace Email
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@optum.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
-                />
-              </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                placeholder="alex.vance@optum.com"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4.5 py-3 bg-slate-50/90 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-xs"
+                required
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Password
-                </label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Password</label>
                 <input
                   type="password"
-                  required
-                  placeholder="••••••••"
                   value={password}
+                  placeholder="••••••••"
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 shadow-xs"
+                  required
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Confirm Password
-                </label>
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1 px-1">Confirm</label>
                 <input
                   type="password"
-                  required
-                  placeholder="••••••••"
                   value={confirmPassword}
+                  placeholder="••••••••"
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-3.5 py-3 bg-slate-900/50 text-white text-sm rounded-xl border border-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-600"
+                  className="w-full px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800 text-xs sm:text-[13px] font-semibold rounded-full border border-slate-200 dark:border-slate-700 shadow-xs"
+                  required
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-lg flex items-center justify-center gap-1.5 mt-6 cursor-pointer active:scale-98"
+              className="w-full py-3.5 bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-xs sm:text-[13px] font-bold rounded-full transition-all shadow-md active:scale-95 cursor-pointer mt-2"
             >
-              Register Account <ArrowRight className="w-4 h-4" />
+              Create Account
             </button>
           </form>
         )}
 
-        {/* Demo Accounts Panel */}
-        <div className="mt-8 border-t border-slate-800/80 pt-6">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-4">
-            Authorized Demonstration Accounts
+        {/* Quick Demo Sign In Pills */}
+        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">
+            One-Click Demo Accounts
           </p>
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-3 gap-2">
             <button
+              type="button"
               onClick={() => handleQuickLogin('admin@optum.com', 'admin123')}
-              className="w-full p-3 bg-slate-900/40 hover:bg-slate-900 text-left border border-slate-800 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
+              className="py-2.5 px-3 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-200 hover:text-indigo-600 rounded-full border border-slate-200/60 dark:border-slate-700 text-center transition-all text-xs font-bold cursor-pointer shadow-xs active:scale-95"
             >
-              <div>
-                <div className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                  System Administrator
-                </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Role: ADMIN • Can manage user roles</div>
-              </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700/30">
-                admin123
-              </span>
+              Admin
             </button>
-
             <button
+              type="button"
               onClick={() => handleQuickLogin('coordinator@optum.com', 'coordinator123')}
-              className="w-full p-3 bg-slate-900/40 hover:bg-slate-900 text-left border border-slate-800 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
+              className="py-2.5 px-3 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-200 hover:text-indigo-600 rounded-full border border-slate-200/60 dark:border-slate-700 text-center transition-all text-xs font-bold cursor-pointer shadow-xs active:scale-95"
             >
-              <div>
-                <div className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                  Care Coordinator (Jordan Lee)
-                </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Role: READ-WRITE • Standard dashboard caseload</div>
-              </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700/30">
-                coordinator123
-              </span>
+              Coordinator
             </button>
-
             <button
+              type="button"
               onClick={() => handleQuickLogin('visitor@optum.com', 'visitor123')}
-              className="w-full p-3 bg-slate-900/40 hover:bg-slate-900 text-left border border-slate-800 rounded-2xl transition-all flex items-center justify-between group cursor-pointer"
+              className="py-2.5 px-3 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-200 hover:text-indigo-600 rounded-full border border-slate-200/60 dark:border-slate-700 text-center transition-all text-xs font-bold cursor-pointer shadow-xs active:scale-95"
             >
-              <div>
-                <div className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                  Auditor Account (Read-Only)
-                </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Role: READ-ONLY • View-only portal directories</div>
-              </div>
-              <span className="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700/30">
-                visitor123
-              </span>
+              Auditor
             </button>
           </div>
         </div>

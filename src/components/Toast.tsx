@@ -35,22 +35,22 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
 
   const styles = {
     success: {
-      bg: 'bg-white dark:bg-slate-900 border-emerald-100 dark:border-emerald-950/60',
-      text: 'text-emerald-800 dark:text-emerald-300',
+      bg: 'bg-optum-white border-optum-gray-200',
+      text: 'text-optum-warm-gray',
       icon: CheckCircle,
-      iconColor: 'text-emerald-500'
+      iconColor: 'text-optum-orange'
     },
     error: {
-      bg: 'bg-white dark:bg-slate-900 border-rose-100 dark:border-rose-950/60',
-      text: 'text-rose-800 dark:text-rose-300',
+      bg: 'bg-optum-white border-optum-blue-pale',
+      text: 'text-optum-warm-gray',
       icon: AlertTriangle,
-      iconColor: 'text-rose-500'
+      iconColor: 'text-optum-blue-dark'
     },
     info: {
-      bg: 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800',
-      text: 'text-slate-800 dark:text-slate-200',
+      bg: 'bg-optum-white border-optum-gray-200',
+      text: 'text-optum-warm-gray',
       icon: Info,
-      iconColor: 'text-sky-500'
+      iconColor: 'text-optum-gray-500/80'
     }
   };
 
@@ -63,9 +63,9 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: (id: string) => void 
         <Icon className={`w-5 h-5 shrink-0 ${current.iconColor}`} />
         <span className={`text-xs font-semibold ${current.text}`}>{toast.text}</span>
       </div>
-      <button 
+      <button
         onClick={() => onRemove(toast.id)}
-        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 rounded-lg transition-all"
+        className="p-1 hover:bg-optum-gray-100 text-optum-gray-500/60 hover:text-optum-warm-gray rounded-lg transition-all"
       >
         <X className="w-4 h-4" />
       </button>

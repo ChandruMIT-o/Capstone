@@ -1,14 +1,15 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 interface StatsCardProps {
   title: string;
   value: string | number;
   subtitle: string;
-  trend: string;
-  trendDirection: 'up' | 'down' | 'neutral';
+  trend?: string;
+  trendDirection?: 'up' | 'down' | 'neutral';
   color: 'purple' | 'peach' | 'green' | 'blue' | 'red';
-  icon: LucideIcon;
+  icon?: LucideIcon;
   onClick?: () => void;
   isActive?: boolean;
 }
@@ -17,97 +18,113 @@ export const StatsCard: React.FC<StatsCardProps> = ({
   title,
   value,
   subtitle,
-  trend,
-  trendDirection,
   color,
-  icon: Icon,
   onClick,
   isActive = false
 }) => {
-  // Pastel styles based on colors
-  const colorMap = {
+  const chartConfigs = {
+    red: {
+      path: "M 0 25 C 20 28, 40 18, 60 15 C 80 12, 100 24, 120 18 C 130 15, 140 8, 150 14 L 150 35 L 0 35 Z",
+      line: "M 0 25 C 20 28, 40 18, 60 15 C 80 12, 100 24, 120 18 C 130 15, 140 8, 150 14",
+      stroke: "#F43F5E",
+      fill: "url(#redGradient)",
+      gradientId: "redGradient",
+      startColor: "#F43F5E",
+      activeRing: "ring-2 ring-rose-500/80 border-rose-500"
+    },
     purple: {
-      bg: 'bg-indigo-50 dark:bg-indigo-950/20',
-      border: 'border-indigo-100 dark:border-indigo-900/30',
-      activeRing: 'ring-2 ring-indigo-500 shadow-lg shadow-indigo-500/10 dark:shadow-indigo-500/5 border-transparent',
-      text: 'text-indigo-600 dark:text-indigo-400',
-      iconBg: 'bg-indigo-100 dark:bg-indigo-900/40',
-      tag: 'text-indigo-800 bg-indigo-100/60 dark:text-indigo-300 dark:bg-indigo-900/30'
+      path: "M 0 28 C 25 15, 50 26, 75 12 C 100 10, 125 22, 150 6 L 150 35 L 0 35 Z",
+      line: "M 0 28 C 25 15, 50 26, 75 12 C 100 10, 125 22, 150 6",
+      stroke: "#6366F1",
+      fill: "url(#blueGradient)",
+      gradientId: "blueGradient",
+      startColor: "#6366F1",
+      activeRing: "ring-2 ring-indigo-500/80 border-indigo-500"
     },
     peach: {
-      bg: 'bg-amber-50 dark:bg-amber-950/20',
-      border: 'border-amber-100 dark:border-amber-900/30',
-      activeRing: 'ring-2 ring-amber-500 shadow-lg shadow-amber-500/10 dark:shadow-amber-500/5 border-transparent',
-      text: 'text-amber-600 dark:text-amber-400',
-      iconBg: 'bg-amber-100 dark:bg-amber-900/40',
-      tag: 'text-amber-800 bg-amber-100/60 dark:text-amber-300 dark:bg-amber-900/30'
+      path: "M 0 30 C 30 12, 60 28, 90 8 C 120 18, 135 10, 150 4 L 150 35 L 0 35 Z",
+      line: "M 0 30 C 30 12, 60 28, 90 8 C 120 18, 135 10, 150 4",
+      stroke: "#F59E0B",
+      fill: "url(#amberGradient)",
+      gradientId: "amberGradient",
+      startColor: "#F59E0B",
+      activeRing: "ring-2 ring-amber-500/80 border-amber-500"
     },
     green: {
-      bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-      border: 'border-emerald-100 dark:border-emerald-900/30',
-      activeRing: 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/10 dark:shadow-emerald-500/5 border-transparent',
-      text: 'text-emerald-600 dark:text-emerald-400',
-      iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
-      tag: 'text-emerald-800 bg-emerald-100/60 dark:text-emerald-300 dark:bg-emerald-900/30'
+      path: "M 0 26 C 25 22, 50 16, 75 18 C 100 10, 125 14, 150 4 L 150 35 L 0 35 Z",
+      line: "M 0 26 C 25 22, 50 16, 75 18 C 100 10, 125 14, 150 4",
+      stroke: "#10B981",
+      fill: "url(#greenGradient)",
+      gradientId: "greenGradient",
+      startColor: "#10B981",
+      activeRing: "ring-2 ring-emerald-500/80 border-emerald-500"
     },
     blue: {
-      bg: 'bg-sky-50 dark:bg-sky-950/20',
-      border: 'border-sky-100 dark:border-sky-900/30',
-      activeRing: 'ring-2 ring-sky-500 shadow-lg shadow-sky-500/10 dark:shadow-sky-500/5 border-transparent',
-      text: 'text-sky-600 dark:text-sky-400',
-      iconBg: 'bg-sky-100 dark:bg-sky-900/40',
-      tag: 'text-sky-800 bg-sky-100/60 dark:text-sky-300 dark:bg-sky-900/30'
-    },
-    red: {
-      bg: 'bg-rose-50 dark:bg-rose-950/20',
-      border: 'border-rose-100 dark:border-rose-900/30',
-      activeRing: 'ring-2 ring-rose-500 shadow-lg shadow-rose-500/10 dark:shadow-rose-500/5 border-transparent',
-      text: 'text-rose-600 dark:text-rose-400',
-      iconBg: 'bg-rose-100/80 dark:bg-rose-900/40',
-      tag: 'text-rose-800 bg-rose-100/60 dark:text-rose-300 dark:bg-rose-900/30'
+      path: "M 0 24 C 30 14, 60 22, 90 12 C 120 16, 135 8, 150 6 L 150 35 L 0 35 Z",
+      line: "M 0 24 C 30 14, 60 22, 90 12 C 120 16, 135 8, 150 6",
+      stroke: "#0284C7",
+      fill: "url(#skyGradient)",
+      gradientId: "skyGradient",
+      startColor: "#0284C7",
+      activeRing: "ring-2 ring-sky-500/80 border-sky-500"
     }
   };
 
-  const currentStyles = colorMap[color];
+  const chart = chartConfigs[color] || chartConfigs.blue;
 
   return (
-    <div 
+    <div
       onClick={onClick}
-      className={`p-5 rounded-2xl border ${currentStyles.bg} ${isActive ? currentStyles.activeRing : currentStyles.border} flex flex-col justify-between h-40 transition-all duration-300 select-none
-        ${onClick ? 'cursor-pointer hover:scale-[1.02] hover:shadow-md active:scale-95' : ''}
+      className={`bg-white/95 dark:bg-[#101726]/95 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between h-[158px] transition-all duration-300 select-none relative overflow-hidden group shadow-[0_2px_12px_rgba(0,0,0,0.02)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)]
+        ${isActive ? chart.activeRing : 'hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:translate-y-[-2px]'}
+        ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}
       `}
     >
+      {/* Subtle background glow effect on hover */}
+      <div
+        className="absolute -right-8 -top-8 w-24 h-24 rounded-full opacity-0 group-hover:opacity-15 blur-xl transition-opacity duration-300 pointer-events-none"
+        style={{ backgroundColor: chart.startColor }}
+      />
+
+      {/* Top Header: Title & Rounded-Full Arrow Badge */}
       <div className="flex items-center justify-between">
-        <span className={`text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400`}>
+        <span className="text-xs sm:text-[13px] font-bold text-slate-700 dark:text-slate-300">
           {title}
         </span>
-        <div className={`p-2.5 rounded-xl ${currentStyles.iconBg}`}>
-          <Icon className={`w-5 h-5 ${currentStyles.text}`} />
+        <div className="w-8 h-8 rounded-full bg-slate-100/90 dark:bg-slate-800/90 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:scale-110 transition-all shadow-xs">
+          <ArrowUpRight className="w-4 h-4" />
         </div>
       </div>
 
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-bold font-sans tracking-tight text-slate-900 dark:text-slate-100">
+      {/* Middle Row: Big Number on Left, Smooth Wave Chart on Right */}
+      <div className="flex items-end justify-between mt-1">
+        <span className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight font-sans">
           {value}
         </span>
-        {trend && (
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-0.5 ${
-            trendDirection === 'up' 
-              ? 'text-emerald-700 bg-emerald-100 dark:text-emerald-300 dark:bg-emerald-950/30' 
-              : trendDirection === 'down'
-                ? 'text-rose-700 bg-rose-100 dark:text-rose-300 dark:bg-rose-950/30'
-                : 'text-slate-600 bg-slate-100 dark:text-slate-400 dark:bg-slate-800/40'
-          }`}>
-            {trendDirection === 'up' && '↗'}
-            {trendDirection === 'down' && '↘'}
-            {trend}
-          </span>
-        )}
+
+        {/* Mini Smooth Wave Sparkline */}
+        <div className="w-28 h-12 shrink-0">
+          <svg viewBox="0 0 150 35" className="w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id={chart.gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={chart.startColor} stopOpacity="0.4" />
+                <stop offset="100%" stopColor={chart.startColor} stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+            <path d={chart.path} fill={chart.fill} />
+            <path d={chart.line} fill="none" stroke={chart.stroke} strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </div>
       </div>
 
-      <div className="mt-2 flex items-center justify-between border-t border-slate-200/50 dark:border-slate-800/50 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
-        <span>{subtitle}</span>
-        <span className="font-semibold text-slate-400">Live updates</span>
+      {/* Bottom Subtitle / Rounded-Full Filter Pill */}
+      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 dark:border-slate-800/80 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium">
+        <span className="truncate">{subtitle}</span>
+        {isActive && (
+          <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 px-3 py-0.5 rounded-full shadow-xs">
+            Active Filter
+          </span>
+        )}
       </div>
     </div>
   );
