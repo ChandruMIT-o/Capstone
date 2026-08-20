@@ -8,11 +8,9 @@ import {
   AlertTriangle,
   Clock,
   Users,
-  Filter,
   Flame,
   Shield,
-  Activity,
-  Sparkles
+  Activity
 } from 'lucide-react';
 
 interface OverdueDashboardViewProps {

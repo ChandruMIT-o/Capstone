@@ -10,8 +10,7 @@ import {
   AlertCircle,
   Filter,
   RotateCcw,
-  Lock,
-  Sparkles
+  Lock
 } from 'lucide-react';
 
 interface ReferralsTableProps {
