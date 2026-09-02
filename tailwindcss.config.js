@@ -8,10 +8,27 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['"Outfit"', 'sans-serif'],
+                sans: ['"Outfit"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                 display: ['"Outfit"', 'sans-serif'],
+                caption: ['"PT Sans Caption"', 'sans-serif'],
             },
             colors: {
+                qd: {
+                    bg: '#000203',
+                    surface: '#181A1C',
+                    card: '#242529',
+                    border: '#373B3E',
+                    text: '#FAFCFE',
+                    muted: '#8A8F98',
+                    mint: '#53FFA9',
+                    lime: '#D3FF69',
+                    lavender: '#9A99FE',
+                    sky: '#97C8EC',
+                    ice: '#97C8EC',
+                    commands: '#9A99FE',
+                    linker: '#D3FF69',
+                    linkage: '#53FFA9',
+                },
                 brand: {
                     50: '#F0F4FF',
                     100: '#E0EAFF',
