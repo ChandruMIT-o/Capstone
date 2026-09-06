@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { Bookmark } from '../types';
 import { guessMetadataFromUrl } from '../utils/heuristics';
-import { X, Link2, Clock, Tag, Sparkles, Folder, Check, Plus } from 'lucide-react';
+import { X, Link2, Sparkles, Folder, Check } from 'lucide-react';
 import { CustomDropdown } from './CustomDropdown';
+import { FaviconWithFallback } from './FaviconWithFallback';
+import { TagInputField } from './TagInputField';
 
 const collectionOptions = [
   { value: 'General', label: 'General' },
@@ -16,12 +18,14 @@ interface QuickCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddBookmark: (b: Omit<Bookmark, 'id' | 'createdAt'>) => void;
+  allExistingTags?: string[];
 }
 
 export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
   isOpen,
   onClose,
   onAddBookmark,
+  allExistingTags = [],
 }) => {
   const [urlInput, setUrlInput] = useState('');
   const [customTitle, setCustomTitle] = useState('');
@@ -29,7 +33,6 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
   const [collection, setCollection] = useState('General');
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [removedTags, setRemovedTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const meta = guessMetadataFromUrl(urlInput);
@@ -47,7 +50,6 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
       setCollection('General');
       setCustomTags([]);
       setRemovedTags([]);
-      setTagInput('');
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
@@ -55,15 +57,6 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  const handleAddTag = () => {
-    const cleaned = tagInput.trim().replace(/^#/, '');
-    if (cleaned && !combinedTags.includes(cleaned)) {
-      setCustomTags((prev) => [...prev, cleaned]);
-      setRemovedTags((prev) => prev.filter((t) => t !== cleaned));
-    }
-    setTagInput('');
-  };
 
   const handleRemoveTag = (tagToRemove: string) => {
     setCustomTags((prev) => prev.filter((t) => t !== tagToRemove));
@@ -141,28 +134,15 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
             <div className="p-4 bg-[#242529] rounded-2xl space-y-3 animate-pop-fade">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {meta.faviconUrl ? (
-                    <img 
-                      src={meta.faviconUrl} 
-                      alt="" 
-                      className="w-5 h-5 rounded-md object-contain"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-5 h-5 rounded bg-[#181A1C] flex items-center justify-center text-[10px] font-mono">
-                      🌐
-                    </div>
-                  )}
+                  <FaviconWithFallback
+                    domain={meta.domain}
+                    faviconUrl={meta.faviconUrl}
+                    title={meta.title}
+                    size="sm"
+                  />
                   <span className="font-caption font-bold text-xs text-[#97C8EC]">
                     {meta.domain || 'Detected Domain'}
                   </span>
-                </div>
-
-                <div className="flex items-center gap-1 text-xs font-mono text-[#8A8F98] bg-[#181A1C] px-3 py-1 rounded-full">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>~{meta.readingTimeMinutes} min read</span>
                 </div>
               </div>
 
@@ -183,49 +163,16 @@ export const QuickCaptureModal: React.FC<QuickCaptureModalProps> = ({
             <label className="block text-xs font-caption font-semibold text-[#8A8F98]">
               Tags (Inferred & Custom)
             </label>
-            <div className="flex items-center gap-2 flex-wrap bg-[#242529] p-3 rounded-2xl min-h-[46px]">
-              <Tag className="w-3.5 h-3.5 text-[#D3FF69] shrink-0" />
-              {combinedTags.map((t) => (
-                <span
-                  key={t}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D3FF69]/15 text-[#D3FF69] text-xs font-caption font-semibold"
-                >
-                  #{t}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(t)}
-                    className="hover:text-rose-400 font-bold transition-colors ml-0.5"
-                    title={`Remove #${t}`}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-              <div className="flex items-center gap-1.5 flex-1 min-w-[150px]">
-                <input
-                  type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ',') {
-                      e.preventDefault();
-                      handleAddTag();
-                    }
-                  }}
-                  placeholder="Type tag & press Enter..."
-                  className="w-full bg-transparent text-xs text-[#FAFCFE] placeholder:text-[#8A8F98] focus:outline-none"
-                />
-                {tagInput.trim() && (
-                  <button
-                    type="button"
-                    onClick={handleAddTag}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D3FF69] text-[#000203] text-[11px] font-caption font-bold shrink-0 hover:brightness-110 transition-all"
-                  >
-                    <Plus className="w-3 h-3 stroke-[3]" /> Add
-                  </button>
-                )}
-              </div>
-            </div>
+            <TagInputField
+              tags={combinedTags}
+              onAddTag={(newTag) => {
+                setCustomTags((prev) => [...prev, newTag]);
+                setRemovedTags((prev) => prev.filter((t) => t !== newTag));
+              }}
+              onRemoveTag={(tagToRemove) => handleRemoveTag(tagToRemove)}
+              allExistingTags={allExistingTags}
+              placeholder="Type tag & press Enter..."
+            />
           </div>
 
           {/* Collection & Notes */}

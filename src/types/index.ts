@@ -9,13 +9,14 @@ export interface Bookmark {
   domain: string;
   description: string;
   faviconUrl: string;
-  readingTimeMinutes: number;
+  readingTimeMinutes?: number;
   tags: string[];
-  status: ReadingStatus;
+  status?: ReadingStatus;
   starred: boolean;
   createdAt: string;
   notes?: string;
   collection?: string;
+  useCount?: number;
 }
 
 export type NodeType = 'link' | 'tag' | 'collection';

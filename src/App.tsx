@@ -1,15 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
-import type { AppView, Bookmark, ReadingStatus } from './types';
-import { getStoredBookmarks, saveBookmarks, fetchBookmarksFromJSON } from './utils/storage';
+import type { AppView, Bookmark } from './types';
+import { 
+  getStoredBookmarks, 
+  saveBookmarks, 
+  fetchBookmarksFromJSON,
+  getStoredPreferences,
+  fetchPreferencesFromJSON,
+  savePreferences,
+  type UserPreferences 
+} from './utils/storage';
 import { QuantumDeskHome } from './components/QuantumDeskHome';
 import { LinkerApp } from './components/LinkerApp';
 import { QuickCaptureModal } from './components/QuickCaptureModal';
 import { QRHandoffModal } from './components/QRHandoffModal';
-import { ReaderModeModal } from './components/ReaderModeModal';
+import { EditLinkModal } from './components/EditLinkModal';
 
 export function App() {
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => getStoredBookmarks());
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const [preferences, setPreferences] = useState<UserPreferences>(() => getStoredPreferences());
+  const [isPrefsLoaded, setIsPrefsLoaded] = useState(false);
+
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -17,27 +30,56 @@ export function App() {
   // Modal States
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
   const [qrBookmark, setQrBookmark] = useState<Bookmark | null>(null);
-  const [readerBookmark, setReaderBookmark] = useState<Bookmark | null>(null);
+  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
 
   const omnibarInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch initial bookmarks from JSON file database on mount
   useEffect(() => {
     fetchBookmarksFromJSON().then((data) => {
-      if (data && data.length > 0) {
-        setBookmarks(data);
-      }
+      setBookmarks(data);
+      setIsLoaded(true);
+    });
+
+    fetchPreferencesFromJSON().then((prefs) => {
+      setPreferences(prefs);
+      setIsPrefsLoaded(true);
     });
   }, []);
 
-  // Persist bookmarks whenever changed (syncs to data/bookmarks.json and localStorage)
+  // Persist bookmarks whenever changed, strictly guarding against uninitialized overwrites
   useEffect(() => {
-    saveBookmarks(bookmarks);
-  }, [bookmarks]);
+    if (isLoaded) {
+      saveBookmarks(bookmarks);
+    }
+  }, [bookmarks, isLoaded]);
+
+  // Persist UI preferences whenever changed
+  useEffect(() => {
+    if (isPrefsLoaded) {
+      savePreferences(preferences);
+    }
+  }, [preferences, isPrefsLoaded]);
+
+  const handleUpdatePreferences = (updated: Partial<UserPreferences>) => {
+    setPreferences((prev) => ({ ...prev, ...updated }));
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleIncrementUseCount = (id: string) => {
+    setBookmarks((prev) =>
+      prev.map((b) => {
+        if (b.id === id) {
+          const updatedCount = (b.useCount || 0) + 1;
+          return { ...b, useCount: updatedCount };
+        }
+        return b;
+      })
+    );
   };
 
   // Keyboard Shortcuts Listener Engine
@@ -48,10 +90,10 @@ export function App() {
 
       // Escape: Dismiss active modal overlay
       if (e.key === 'Escape') {
-        if (isCaptureOpen || qrBookmark || readerBookmark) {
+        if (isCaptureOpen || qrBookmark || editingBookmark) {
           setIsCaptureOpen(false);
           setQrBookmark(null);
-          setReaderBookmark(null);
+          setEditingBookmark(null);
           return;
         }
       }
@@ -105,6 +147,7 @@ export function App() {
         const selected = activeBookmarks[selectedIndex];
         if (selected) {
           navigator.clipboard.writeText(selected.url);
+          handleIncrementUseCount(selected.id);
           showToast(`Copied URL: ${selected.domain}`);
         }
       }
@@ -124,6 +167,7 @@ export function App() {
         const selected = activeBookmarks[selectedIndex];
         if (selected) {
           window.open(selected.url, '_blank', 'noopener,noreferrer');
+          handleIncrementUseCount(selected.id);
           showToast(`Opened: ${selected.domain}`);
         }
       }
@@ -131,7 +175,7 @@ export function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [bookmarks, selectedIndex, searchQuery, currentView, isCaptureOpen, qrBookmark, readerBookmark]);
+  }, [bookmarks, selectedIndex, searchQuery, currentView, isCaptureOpen, qrBookmark, editingBookmark]);
 
   // Bookmark Mutation Handlers
   const handleAddBookmark = (newBm: Omit<Bookmark, 'id' | 'createdAt'>) => {
@@ -139,6 +183,7 @@ export function App() {
       ...newBm,
       id: `bm-${Date.now()}`,
       createdAt: new Date().toISOString(),
+      useCount: 0,
     };
     setBookmarks((prev) => [created, ...prev]);
     showToast(`Preserved link: ${created.title}`);
@@ -157,48 +202,16 @@ export function App() {
     );
   };
 
-  const handleCycleStatus = (id: string) => {
-    const nextStatus: Record<ReadingStatus, ReadingStatus> = {
-      unread: 'reading',
-      reading: 'completed',
-      completed: 'unread',
-    };
-
+  const handleUpdateBookmark = (updated: Bookmark) => {
     setBookmarks((prev) =>
-      prev.map((b) => {
-        if (b.id === id) {
-          const next = nextStatus[b.status];
-          showToast(`Status updated: ${next.toUpperCase()}`);
-          return { ...b, status: next };
-        }
-        return b;
-      })
+      prev.map((b) => (b.id === updated.id ? updated : b))
     );
+    showToast('Link details updated');
   };
 
   const handleDeleteBookmark = (id: string) => {
     setBookmarks((prev) => prev.filter((b) => b.id !== id));
     showToast('Link removed');
-  };
-
-  const handleUpdateStatus = (id: string, newStatus: ReadingStatus) => {
-    setBookmarks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
-    );
-  };
-
-  const handleSaveNotes = (id: string, notes: string) => {
-    setBookmarks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, notes } : b))
-    );
-    showToast('Notes saved');
-  };
-
-  const handleUpdateTags = (id: string, tags: string[]) => {
-    setBookmarks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, tags } : b))
-    );
-    showToast('Tags updated');
   };
 
   return (
@@ -219,12 +232,13 @@ export function App() {
             selectedIndex={selectedIndex}
             onSelectIndex={setSelectedIndex}
             onToggleStar={handleToggleStar}
-            onCycleStatus={handleCycleStatus}
+            onIncrementUseCount={handleIncrementUseCount}
             onDeleteBookmark={handleDeleteBookmark}
-            onOpenReader={(b) => setReaderBookmark(b)}
+            onEditBookmark={(b) => setEditingBookmark(b)}
             onOpenQR={(b) => setQrBookmark(b)}
-            onCopyUrl={(url) => {
+            onCopyUrl={(url, id) => {
               navigator.clipboard.writeText(url);
+              if (id) handleIncrementUseCount(id);
               showToast('Clean URL copied');
             }}
             onOpenCapture={() => setIsCaptureOpen(true)}
@@ -233,29 +247,39 @@ export function App() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             omnibarInputRef={omnibarInputRef}
+            preferences={preferences}
+            onUpdatePreferences={handleUpdatePreferences}
           />
         )}
       </div>
 
       {/* Global Modals */}
-      <QuickCaptureModal
-        isOpen={isCaptureOpen}
-        onClose={() => setIsCaptureOpen(false)}
-        onAddBookmark={handleAddBookmark}
-      />
+      {(() => {
+        const allExistingTags = Array.from(new Set(bookmarks.flatMap((b) => b.tags)));
+        return (
+          <>
+            <QuickCaptureModal
+              isOpen={isCaptureOpen}
+              onClose={() => setIsCaptureOpen(false)}
+              onAddBookmark={handleAddBookmark}
+              allExistingTags={allExistingTags}
+            />
 
-      <QRHandoffModal
-        bookmark={qrBookmark}
-        onClose={() => setQrBookmark(null)}
-      />
+            <QRHandoffModal
+              bookmark={qrBookmark}
+              onClose={() => setQrBookmark(null)}
+            />
 
-      <ReaderModeModal
-        bookmark={readerBookmark}
-        onClose={() => setReaderBookmark(null)}
-        onUpdateStatus={handleUpdateStatus}
-        onSaveNotes={handleSaveNotes}
-        onUpdateTags={handleUpdateTags}
-      />
+            <EditLinkModal
+              isOpen={!!editingBookmark}
+              bookmark={editingBookmark}
+              onClose={() => setEditingBookmark(null)}
+              onSaveBookmark={handleUpdateBookmark}
+              allExistingTags={allExistingTags}
+            />
+          </>
+        );
+      })()}
 
     </div>
   );
