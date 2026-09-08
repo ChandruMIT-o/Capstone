@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { AppView, Bookmark } from './types';
+import type { AppView, Bookmark, CommandItem } from './types';
 import { 
   getStoredBookmarks, 
   saveBookmarks, 
@@ -10,8 +10,10 @@ import {
   savePreferences,
   type UserPreferences 
 } from './utils/storage';
+import { getStoredCommands, saveCommands } from './utils/commandStorage';
 import { QuantumDeskHome } from './components/QuantumDeskHome';
 import { LinkerApp } from './components/LinkerApp';
+import { CommandDeskApp } from './components/CommandDeskApp';
 import { QuickCaptureModal } from './components/QuickCaptureModal';
 import { QRHandoffModal } from './components/QRHandoffModal';
 import { EditLinkModal } from './components/EditLinkModal';
@@ -20,6 +22,8 @@ export function App() {
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => getStoredBookmarks());
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const [commands, setCommands] = useState<CommandItem[]>(() => getStoredCommands());
 
   const [preferences, setPreferences] = useState<UserPreferences>(() => getStoredPreferences());
   const [isPrefsLoaded, setIsPrefsLoaded] = useState(false);
@@ -48,12 +52,17 @@ export function App() {
     });
   }, []);
 
-  // Persist bookmarks whenever changed, strictly guarding against uninitialized overwrites
+  // Persist bookmarks whenever changed
   useEffect(() => {
     if (isLoaded) {
       saveBookmarks(bookmarks);
     }
   }, [bookmarks, isLoaded]);
+
+  // Persist commands whenever changed
+  useEffect(() => {
+    saveCommands(commands);
+  }, [commands]);
 
   // Persist UI preferences whenever changed
   useEffect(() => {
@@ -79,6 +88,60 @@ export function App() {
           return { ...b, useCount: updatedCount };
         }
         return b;
+      })
+    );
+  };
+
+  // Commands Engine Handlers
+  const handleAddCommand = (cmdData: Partial<CommandItem>) => {
+    const newCmd: CommandItem = {
+      id: `cmd-${Date.now()}`,
+      title: cmdData.title || 'Untitled Command',
+      command: cmdData.command || '',
+      category: cmdData.category || 'Custom',
+      shellType: cmdData.shellType || 'zsh',
+      defaultCwd: cmdData.defaultCwd,
+      description: cmdData.description,
+      variables: cmdData.variables || [],
+      tags: cmdData.tags || [],
+      starred: cmdData.starred || false,
+      useCount: 0,
+      createdAt: new Date().toISOString(),
+    };
+    setCommands((prev) => [newCmd, ...prev]);
+    showToast(`Preserved command: ${newCmd.title}`);
+  };
+
+  const handleUpdateCommand = (updated: CommandItem) => {
+    setCommands((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    showToast('Command details updated');
+  };
+
+  const handleDeleteCommand = (id: string) => {
+    setCommands((prev) => prev.filter((c) => c.id !== id));
+    showToast('Command removed from vault');
+  };
+
+  const handleToggleCommandStar = (id: string) => {
+    setCommands((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const updated = !c.starred;
+          showToast(updated ? 'Starred command' : 'Unstarred command');
+          return { ...c, starred: updated };
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleIncrementCommandUseCount = (id: string) => {
+    setCommands((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          return { ...c, useCount: (c.useCount || 0) + 1, lastUsedAt: new Date().toISOString() };
+        }
+        return c;
       })
     );
   };
@@ -268,6 +331,29 @@ export function App() {
                 omnibarInputRef={omnibarInputRef}
                 preferences={preferences}
                 onUpdatePreferences={handleUpdatePreferences}
+              />
+            </motion.div>
+          )}
+
+          {currentView === 'commands' && (
+            <motion.div
+              key="commands"
+              initial={{ opacity: 0, scale: 0.96, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 1.04, filter: 'blur(4px)' }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full h-full"
+            >
+              <CommandDeskApp
+                commands={commands}
+                onAddCommand={handleAddCommand}
+                onUpdateCommand={handleUpdateCommand}
+                onDeleteCommand={handleDeleteCommand}
+                onToggleStar={handleToggleCommandStar}
+                onIncrementUseCount={handleIncrementCommandUseCount}
+                onReturnHome={() => setCurrentView('home')}
+                toastMessage={toastMessage}
+                showToast={showToast}
               />
             </motion.div>
           )}

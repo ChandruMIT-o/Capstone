@@ -50,3 +50,23 @@ export interface CommandMacro {
   category: 'System' | 'Data' | 'Graph' | 'Queue';
   action: string;
 }
+
+export type CommandCategory = 'Git' | 'Docker' | 'Node/npm' | 'System' | 'Database' | 'Kubernetes' | 'Custom';
+export type ShellType = 'bash' | 'zsh' | 'powershell' | 'cmd';
+
+export interface CommandItem {
+  id: string;
+  title: string;
+  command: string;
+  description?: string;
+  category: CommandCategory;
+  shellType: ShellType;
+  defaultCwd?: string;
+  variables?: string[];
+  tags: string[];
+  useCount: number;
+  starred: boolean;
+  createdAt: string;
+  lastUsedAt?: string;
+}
+

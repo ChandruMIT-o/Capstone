@@ -159,41 +159,52 @@ export const QuantumDeskHome: React.FC<QuantumDeskHomeProps> = ({
             </div>
           </motion.div>
 
-          {/* Secondary Disabled Card: Commands App (Coming Soon) */}
+          {/* Active Commands App Feature Card */}
           <motion.div
             variants={itemVariants}
-            className="md:col-span-4 relative macos-card p-8 shadow-xl flex flex-col justify-between opacity-60 cursor-not-allowed select-none border border-white/5"
+            whileHover={{ y: -4, scale: 1.01, boxShadow: '0 20px 40px -15px rgba(154, 153, 254, 0.2)' }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+            onClick={() => onSelectView('commands')}
+            role="button"
+            tabIndex={0}
+            className="md:col-span-4 group relative macos-card p-8 shadow-2xl cursor-pointer flex flex-col justify-between border border-white/10 hover:border-[#9A99FE]/40 transition-colors"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#9A99FE]/10 border border-[#9A99FE]/20 text-[#9A99FE]">
-                  COMING SOON
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#9A99FE]/15 border border-[#9A99FE]/30 text-[#9A99FE]">
+                  APPLICATION ACTIVE v2.0
                 </span>
-                <Terminal className="w-5 h-5 text-[#9A99FE]/60" />
+                <Terminal className="w-5 h-5 text-[#9A99FE]" />
               </div>
 
-              <div className="w-20 h-20 bg-[#000203]/50 border border-white/5 rounded-2xl flex items-center justify-center p-4 mb-5">
+              <div className="w-20 h-20 bg-[#000203]/50 border border-white/10 rounded-2xl flex items-center justify-center p-4 mb-5 group-hover:border-[#9A99FE]/30 transition-colors">
                 <img
                   src="/logos/commands.png"
-                  alt="Commands Logo"
-                  className="w-full h-full object-contain opacity-50 grayscale"
+                  alt="Commands Engine Logo"
+                  className="w-full h-full object-contain filter drop-shadow-[0_4px_16px_rgba(154,153,254,0.2)]"
                 />
               </div>
 
-              <h3 className="font-caption font-bold text-xl text-[#FAFCFE]/80 mb-2">
+              <h3 className="font-caption font-bold text-xl text-[#FAFCFE] group-hover:text-[#9A99FE] transition-colors mb-2">
                 COMMANDS ENGINE
               </h3>
 
               <p className="text-xs text-[#8A8F98] font-sans leading-relaxed">
-                Developer macro runner, automated bulk exports, and CLI task orchestration terminal.
+                Terminal command vault, dynamic variable runner, target directory direct execution, & shell history importer.
               </p>
             </div>
 
-            <div className="mt-8 pt-4 flex items-center justify-between text-xs font-mono text-[#8A8F98]/70 border-t border-white/5">
-              <span>Under Development</span>
-              <span className="px-3 py-1 rounded-full bg-[#242529]/50 text-[10px]">
-                v2.0 Pipeline
-              </span>
+            <div className="mt-8 pt-4 flex items-center justify-between border-t border-white/10">
+              <span className="text-xs font-mono text-[#53FFA9]">Operational</span>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#9A99FE] text-[#000203] font-caption font-bold text-xs rounded-full shadow-lg"
+              >
+                <span>Launch Vault</span>
+                <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+              </motion.div>
             </div>
           </motion.div>
 

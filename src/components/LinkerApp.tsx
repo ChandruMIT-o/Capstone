@@ -788,19 +788,22 @@ export const LinkerApp: React.FC<LinkerAppProps> = ({
 
                       {/* Sub-links Grid Container */}
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <AnimatePresence>
+                        <AnimatePresence mode="popLayout">
                           {group.bookmarks.map((bookmark) => {
                             const useCount = bookmark.useCount || 0;
                             const isMenuOpen = openMenuId === bookmark.id;
 
                             return (
                               <motion.div
-                                layout
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                layout="position"
+                                initial={{ opacity: 0, scale: 0.97 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.97 }}
                                 whileHover={{ y: -3, scale: 1.008 }}
-                                transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                                transition={{
+                                  layout: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
+                                  opacity: { duration: 0.15 },
+                                }}
                                 key={bookmark.id}
                                 onClick={() => handleOpenLink(bookmark)}
                                 className={`macos-card p-4 flex flex-col justify-between cursor-pointer group relative overflow-hidden transition-all duration-300 border ${domainTheme.cardBorder} ${domainTheme.glowShadow}`}
@@ -915,7 +918,7 @@ export const LinkerApp: React.FC<LinkerAppProps> = ({
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto"
               >
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout">
                   {sortedBookmarks.map((bookmark, idx) => {
                     const isSelected = idx === selectedIndex;
                     const useCount = bookmark.useCount || 0;
@@ -924,12 +927,16 @@ export const LinkerApp: React.FC<LinkerAppProps> = ({
 
                     return (
                       <motion.div
-                        layout
-                        initial={{ opacity: 0, scale: 0.95, y: 12 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        layout="position"
+                        initial={{ opacity: 0, scale: 0.97 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.97 }}
                         whileHover={{ y: -4, scale: 1.01 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                        transition={{
+                          layout: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+                          opacity: { duration: 0.15 },
+                          scale: { duration: 0.15 },
+                        }}
                         key={bookmark.id}
                         onClick={() => {
                           onSelectIndex(idx);
@@ -1107,7 +1114,7 @@ export const LinkerApp: React.FC<LinkerAppProps> = ({
                 exit={{ opacity: 0 }}
                 className="space-y-3 max-w-5xl mx-auto"
               >
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout">
                   {sortedBookmarks.map((bookmark, idx) => {
                     const isSelected = idx === selectedIndex;
                     const useCount = bookmark.useCount || 0;
@@ -1116,12 +1123,15 @@ export const LinkerApp: React.FC<LinkerAppProps> = ({
 
                     return (
                       <motion.div
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
+                        layout="position"
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                        exit={{ opacity: 0 }}
                         whileHover={{ x: 2, scale: 1.003 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                        transition={{
+                          layout: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
+                          opacity: { duration: 0.15 },
+                        }}
                         key={bookmark.id}
                         onClick={() => {
                           onSelectIndex(idx);
