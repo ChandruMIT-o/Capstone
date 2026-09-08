@@ -149,3 +149,21 @@
 .animate-pop-fade {
   animation: popFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Continuous slow-gliding gradient animation for card top accent bars */
+@keyframes continuousGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-accent-gradient {
+  background-size: 200% 200%;
+  animation: continuousGradientShift 7s ease-in-out infinite;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { AppView, Bookmark } from './types';
 import { 
   getStoredBookmarks, 
@@ -218,39 +219,59 @@ export function App() {
     <div className="min-h-screen bg-[#000203] text-[#FAFCFE] font-sans flex flex-col antialiased selection:bg-[#D3FF69] selection:text-[#000203]">
       
       {/* App Workspace Navigation Router */}
-      <div className="flex-1">
-        {currentView === 'home' && (
-          <QuantumDeskHome
-            onSelectView={setCurrentView}
-            bookmarks={bookmarks}
-          />
-        )}
+      <div className="flex-1 relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {currentView === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, scale: 0.96, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 1.04, filter: 'blur(4px)' }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full h-full"
+            >
+              <QuantumDeskHome
+                onSelectView={setCurrentView}
+                bookmarks={bookmarks}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'linker' && (
-          <LinkerApp
-            bookmarks={bookmarks}
-            selectedIndex={selectedIndex}
-            onSelectIndex={setSelectedIndex}
-            onToggleStar={handleToggleStar}
-            onIncrementUseCount={handleIncrementUseCount}
-            onDeleteBookmark={handleDeleteBookmark}
-            onEditBookmark={(b) => setEditingBookmark(b)}
-            onOpenQR={(b) => setQrBookmark(b)}
-            onCopyUrl={(url, id) => {
-              navigator.clipboard.writeText(url);
-              if (id) handleIncrementUseCount(id);
-              showToast('Clean URL copied');
-            }}
-            onOpenCapture={() => setIsCaptureOpen(true)}
-            onReturnHome={() => setCurrentView('home')}
-            toastMessage={toastMessage}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            omnibarInputRef={omnibarInputRef}
-            preferences={preferences}
-            onUpdatePreferences={handleUpdatePreferences}
-          />
-        )}
+          {currentView === 'linker' && (
+            <motion.div
+              key="linker"
+              initial={{ opacity: 0, scale: 0.96, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 1.04, filter: 'blur(4px)' }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full h-full"
+            >
+              <LinkerApp
+                bookmarks={bookmarks}
+                selectedIndex={selectedIndex}
+                onSelectIndex={setSelectedIndex}
+                onToggleStar={handleToggleStar}
+                onIncrementUseCount={handleIncrementUseCount}
+                onDeleteBookmark={handleDeleteBookmark}
+                onEditBookmark={(b) => setEditingBookmark(b)}
+                onOpenQR={(b) => setQrBookmark(b)}
+                onCopyUrl={(url, id) => {
+                  navigator.clipboard.writeText(url);
+                  if (id) handleIncrementUseCount(id);
+                  showToast('Clean URL copied');
+                }}
+                onOpenCapture={() => setIsCaptureOpen(true)}
+                onReturnHome={() => setCurrentView('home')}
+                toastMessage={toastMessage}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                omnibarInputRef={omnibarInputRef}
+                preferences={preferences}
+                onUpdatePreferences={handleUpdatePreferences}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Global Modals */}
